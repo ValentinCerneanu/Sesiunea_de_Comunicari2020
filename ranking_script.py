@@ -85,7 +85,7 @@ def main():
             if isNotNaN(row[1]) and isNotNaN(row[2]):
                 score = float(row[1]) * 1/100 * float(row[2])
                 country_gdp_ranking[row[0]] = score
-                sorted_country_ranking[row[0]] = score
+#                sorted_country_ranking[row[0]] = score
         except Exception as e:
             errors = errors + str(e)
 
