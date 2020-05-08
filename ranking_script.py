@@ -8,6 +8,7 @@ Created on Mon Apr 20 18:40:18 2020
 import pandas as pd
 
 from sklearn.neural_network import MLPRegressor
+import matplotlib.pyplot as plt
 import requests
 import numpy as np
 import operator
@@ -41,7 +42,6 @@ def main():
     for index, row in df.iterrows():
         try:           
             print(row['Slug'])
-            print(index)
         
             response = requests.request("GET", byCountryUrl.format(row['Slug']), headers=headers, data = payload)
             responseArray = np.array(response.json())
@@ -64,15 +64,28 @@ def main():
                 net = MLPRegressor(hidden_layer_sizes=(10, 10), activation='relu', solver='lbfgs') #perfect
                 
                 net.fit(X, T)
-                predictedData = net.predict(predict) 
+                predictedData = net.predict(predict)
+
+                if row['Slug'] == 'romania' or row['Slug'] == 'united-states' or row['Slug'] == 'italy':
+                    realDataNumber = len(data.iloc[1:,7])
+                    t1 = np.arange(realDataNumber)
+                    t2 = np.arange(realDataNumber, realDataNumber + len(predictedData))
+                    plt.figure()
+                    dataForPlot = np.array(data.iloc[1:,7])
+                    plt.plot(t1, dataForPlot.astype(np.int),'.-b', label='real data')
+                    plt.plot(t2, predictedData[:,0],'.-r', label='predicted data')
+                    plt.title("Real and Predicted data for " + row['Country'])
+                    plt.xlabel('days')
+                    plt.ylabel('number of cases')
+                    plt.legend()
+
+
                 if countries_population.get(row['Country']) > 0:
                     score = round(round(predictedData[9][0], 3) / countries_population.get(row['Country']) * 100, 4)
                     country_ranking[row['Country']] = score
             
         except Exception as e:
             errors = errors + str(e)
-        if index > 15:
-            break
     print(errors)
                     
     print(country_ranking)
